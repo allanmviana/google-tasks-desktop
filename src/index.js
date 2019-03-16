@@ -6,19 +6,23 @@ import {
 } from 'electron';
 import path from 'path'
 
+
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
 const assetsDirectory = path.join(__dirname, '/assets')
 
-app.dock.hide()
+let win;
+//win.setSkipTaskbar(true);
+//setSkipTaskbar (true);
+
 
 let mainWindow;
 let tray;
 
 const createTray = () => {
-  tray = new Tray(path.join(assetsDirectory, 'iconTemplate.png'))
+  tray = new Tray(path.join(assetsDirectory, 'iconTemplate@2xwhite.png'))
   tray.on('click', (event) => {
     toggleWindow()
   })
@@ -28,9 +32,9 @@ const getWindowPosition = () => {
   const windowBounds = mainWindow.getBounds()
   const trayBounds = tray.getBounds()
 
-  const x = Math.round(trayBounds.x + (trayBounds.width / 2) - (windowBounds.width / 2))
+  const x = 1600 // Math.round(trayBounds.x + (trayBounds.width / 2) - (windowBounds.width / 2))
 
-  const y = Math.round(trayBounds.y + trayBounds.height + 8)
+  const y = 600 // Math.round(trayBounds.y + trayBounds.height + 8)
 
   return {
     x: x,
@@ -38,31 +42,17 @@ const getWindowPosition = () => {
   }
 }
 
-systemPreferences.subscribeNotification(
-  'AppleInterfaceThemeChangedNotification',
-  function theThemeHasChanged() {
-    if (systemPreferences.isDarkMode()) {
-      mainWindow.webContents.executeJavaScript(`
-        document.body.classList.add('dark')
-      `)
-    } else {
-      mainWindow.webContents.executeJavaScript(`
-        document.body.classList.remove('dark')
-      `)
-    }
-  }
-)
-
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 350,
-    height: 520,
+    width: 300,
+    height: 500,
     show: false,
     frame: false,
-    fullscreenable: false,
-    resizable: false,
-    icon: __dirname + '/assets/logo.icns'
+    fullscreenable: true,
+    resizable: true,
+    icon: __dirname + '/assets/logo.ico'
   });
+
   mainWindow.loadURL(`https://accounts.google.com/signin/v2/identifier?hl=ru&passive=true&continue=https%3A%2F%2Ftasks.google.com%2Fembed%2F%3Forigin%3Dhttps%3A%2F%2Fmail.google.com%26hai%3D3%26hc%3D4%2C1%2C5%26forcehl%3D1%26usegapi%3D1&flowName=GlifWebSignIn&flowEntry=ServiceLogin#identifier`);
   mainWindow.setTitle('Google Tasks')
   mainWindow.webContents.on('dom-ready', (e) => {
